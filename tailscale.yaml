@@ -1,0 +1,20 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Install Tailscale
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Install GPG key
+      apt_key:
+        url: https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg
+
+    - name: Install APT repo
+      apt_repository:
+        repo: deb [arch=amd64] https://pkgs.tailscale.com/stable/debian bullseye main
+
+    - name: Install Tailscale
+      apt:
+        update_cache: True
+        name: tailscale
+        state: latest
