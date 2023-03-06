@@ -1,0 +1,37 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Install Tailscale
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Add backports repo
+      apt_repository:
+        repo: deb http://deb.debian.org/debian bullseye-backports main contrib
+
+    - name: Add zfs package preferences
+      copy:
+        dest: /etc/apt/preferences.d/90_zfs
+        content: |-
+          Package: src:zfs-linux
+          Pin: release n=bullseye-backports
+          Pin-Priority: 990
+
+    - name: Install zfs pre-reqs
+      apt:
+        update_cache: True  
+        name: '{{ item }}'
+      loop:
+        - dpkg-dev
+        - "linux-headers-{{ ansible_facts['kernel'] }}"
+        - "linux-image-{{ ansible_facts['kernel'] }}"
+        - nfs-common
+        - nfs-kernel-server
+
+    - name: Install zfs
+      apt:
+        update_cache: True
+        name: '{{ item }}'
+      loop:
+        - zfs-dkms
+        - zfsutils-linux
