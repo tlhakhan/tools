@@ -1,6 +1,6 @@
 #!/usr/local/bin/ansible-playbook
 ---
-- name: Install Tailscale
+- name: Install OpenZFS 
   hosts: localhost
   connection: local
 
