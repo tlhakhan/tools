@@ -1,0 +1,28 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Install Hashicorp tools
+  hosts: localhost
+  connection: local
+
+  tasks:
+  - name: Install gpg package
+    package:
+      name: gpg
+
+  - name: Get GPG key
+    apt_key:
+      url: https://apt.releases.hashicorp.com/gpg
+      state: present
+
+  - name: Add APT repo
+    apt_repository:
+      repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main"
+
+  - name: Install tools
+    apt:
+      update_cache: True
+      name: '{{ item }}'
+    loop:
+      - packer
+      - terraform
+      - vault
