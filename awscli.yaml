@@ -4,6 +4,9 @@
   hosts: localhost
   connection: local
 
+  vars:
+    iamlive_version: v0.51.2
+
   tasks:
 
     - name: Install OS packages
@@ -18,7 +21,7 @@
       args:
         creates: /tmp/awscliv2.zip
 
-    - name: Unzip the archive
+    - name: Unzip the awscliv2.zip
       command: unzip awscliv2.zip
       args:
         chdir: /tmp
@@ -29,3 +32,25 @@
       args:
         chdir: /tmp/aws
         creates: /usr/local/bin/aws
+
+    - name: Install IAMLive
+      command: curl -L "https://github.com/iann0036/iamlive/releases/download/{{ iamlive_version }}/iamlive-{{ iamlive_version }}-linux-amd64.tar.gz" -o "/tmp/iamlive.tar.gz"
+      args:
+        creates: /tmp/iamlive.tar.gz
+
+    - name: Extract iamlive.tar.gz
+      command: tar --no-same-owner -zxf /tmp/iamlive.tar.gz -C /usr/local/bin
+      args:
+        chdir: /tmp
+        creates: /usr/local/bin/iamlive
+
+    - name: Download IAM policy to Terraform
+      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/1.8.2/iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
+      args:
+        creates: /tmp/iamtf
+
+    - name: Copy iamtf to /usr/local/bin
+      copy:
+        src: /tmp/iamtf
+        dest: /usr/local/bin/
+        mode: 0755
