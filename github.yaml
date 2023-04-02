@@ -1,0 +1,26 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Install GitHub tools
+  hosts: localhost
+  connection: local
+
+  tasks:
+  - name: Install gpg package
+    package:
+      name: gpg
+
+  - name: Get GPG key
+    apt_key:
+      url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+      state: present
+
+  - name: Add APT repo
+    apt_repository:
+      repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
+
+  - name: Install tools
+    apt:
+      update_cache: True
+      name: '{{ item }}'
+    loop:
+      - gh
