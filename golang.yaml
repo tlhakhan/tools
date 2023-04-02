@@ -1,0 +1,26 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Install Golang
+  hosts: localhost
+  connection: local
+  vars:
+    golang_version: 1.20.2
+
+  tasks:
+    - name: Get Golang
+      command: curl -L "https://go.dev/dl/go{{ golang_version }}.linux-amd64.tar.gz" -o golang.tar.gz
+      args:
+        chdir: /tmp
+        creates: /tmp/golang.tar.gz
+
+    - name: Install Golang
+      command: tar -C /usr/local -xzf golang.tar.gz
+      args:
+        chdir: /tmp
+        creates: /usr/local/go/bin/go
+
+    - name: Update PATH variable
+      lineinfile:
+        path: ~/.profile
+        line: "export PATH=$PATH:/usr/local/go/bin"
+        create: yes
