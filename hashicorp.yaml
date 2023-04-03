@@ -26,3 +26,16 @@
       - packer
       - terraform
       - vault
+
+  - name: Download Terraform Docs
+    command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-amd64.tar.gz" -o "terraform-docs.tar.gz"
+    args:
+      chdir: /tmp
+      creates: /tmp/terraform-docs.tar.gz
+
+  - name: Extract terraform-docs.tar.gz
+    command: tar -C /usr/local/bin --no-same-owner -zxf terraform-docs.tar.gz terraform-docs
+    args:
+      chdir: /tmp
+      creates: /usr/local/bin/terraform-docs
+
