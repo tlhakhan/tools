@@ -39,3 +39,10 @@
       chdir: /tmp
       creates: /usr/local/bin/terraform-docs
 
+  - name: Setup aliases
+    lineinfile:
+      path: ~/.bashrc
+      line: '{{ item }} '
+    loop:
+      - alias tf='terraform'
+      - alias tfdocs='terraform-docs'
