@@ -17,6 +17,12 @@
   - name: Add APT repo
     apt_repository:
       repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main"
+    when: ansible_machine == "x86_64"
+
+  - name: Add APT repo
+    apt_repository:
+      repo: "deb [arch=arm64] https://apt.releases.hashicorp.com {{ ansible_facts['distribution_release'] }} main"
+    when: ansible_machine == "aarch64"
 
   - name: Install tools
     apt:
@@ -27,11 +33,19 @@
       - terraform
       - vault
 
-  - name: Download Terraform Docs
+  - name: Download Terraform Docs x86_64
     command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-amd64.tar.gz" -o "terraform-docs.tar.gz"
     args:
       chdir: /tmp
       creates: /tmp/terraform-docs.tar.gz
+    when: ansible_machine == "x86_64"
+
+  - name: Download Terraform Docs aarch64
+    command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-arm64.tar.gz" -o "terraform-docs.tar.gz"
+    args:
+      chdir: /tmp
+      creates: /tmp/terraform-docs.tar.gz
+    when: ansible_machine == "aarch64"
 
   - name: Extract terraform-docs.tar.gz
     command: tar -C /usr/local/bin --no-same-owner -zxf terraform-docs.tar.gz terraform-docs
