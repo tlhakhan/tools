@@ -16,10 +16,17 @@
         - curl
         - unzip
 
-    - name: Get AWS CLI archive for Linux
+    - name: Get AWS CLI archive for Linux amd64
       command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
       args:
         creates: /tmp/awscliv2.zip
+      when: ansible_machine == "x86_64"
+
+    - name: Get AWS CLI archive for Linux aarch64
+      command: curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "/tmp/awscliv2.zip"
+      args:
+        creates: /tmp/awscliv2.zip
+      when: ansible_machine == "aarch64"
 
     - name: Unzip the awscliv2.zip
       command: unzip awscliv2.zip
@@ -33,10 +40,17 @@
         chdir: /tmp/aws
         creates: /usr/local/bin/aws
 
-    - name: Install IAMLive
+    - name: Install IAMLive x86_64
       command: curl -L "https://github.com/iann0036/iamlive/releases/download/{{ iamlive_version }}/iamlive-{{ iamlive_version }}-linux-amd64.tar.gz" -o "/tmp/iamlive.tar.gz"
       args:
         creates: /tmp/iamlive.tar.gz
+      when: ansible_machine == "x86_64"
+
+    - name: Install IAMLive aarch64
+      command: curl -L "https://github.com/iann0036/iamlive/releases/download/{{ iamlive_version }}/iamlive-{{ iamlive_version }}-linux-arm64.tar.gz" -o "/tmp/iamlive.tar.gz"
+      args:
+        creates: /tmp/iamlive.tar.gz
+      when: ansible_machine == "aarch64"
 
     - name: Extract iamlive.tar.gz
       command: tar --no-same-owner -zxf /tmp/iamlive.tar.gz -C /usr/local/bin
@@ -44,10 +58,17 @@
         chdir: /tmp
         creates: /usr/local/bin/iamlive
 
-    - name: Download IAM policy to Terraform
+    - name: Download IAM policy to Terraform x86_64
       command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/1.8.2/iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
       args:
         creates: /tmp/iamtf
+      when: ansible_machine == "x86_64"
+
+    - name: Download IAM policy to Terraform
+      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/1.8.2/iam-policy-json-to-terraform_arm64" -o "/tmp/iamtf"
+      args:
+        creates: /tmp/iamtf
+      when: ansible_machine == "aarch64"
 
     - name: Copy iamtf to /usr/local/bin
       copy:
