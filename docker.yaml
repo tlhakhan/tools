@@ -4,7 +4,7 @@
   hosts: localhost
   connection: local
   vars:
-    docker_compose_version: v2.14.0
+    docker_compose_version: v2.17.2
 
   tasks:
 
@@ -23,9 +23,15 @@
       apt_key:
         url: https://download.docker.com/linux/debian/gpg
 
-    - name: Add APT repo
+    - name: Add APT repo x86_64
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_facts['distribution_release'] }} stable"
+      when: ansible_machine == "x86_64"
+
+    - name: Add APT repo aarch64
+      apt_repository:
+        repo: "deb [arch=arm64] https://download.docker.com/linux/debian {{ ansible_facts['distribution_release'] }} stable"
+      when: ansible_machine == "aarch64"
 
     - name: Create config folder
       file:
@@ -68,8 +74,16 @@
         state: started
         enabled: True
 
-    - name: Get the docker-compose binary
+    - name: Get the docker-compose binary x86_64
       get_url:
         url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-x86_64
         dest: /usr/local/bin/docker-compose
         mode: 0755
+      when: ansible_machine == "x86_64"
+
+    - name: Get the docker-compose binary aarch64
+      get_url:
+        url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-aarch64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+      when: ansible_machine == "aarch64"
