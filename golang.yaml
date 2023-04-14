@@ -7,11 +7,19 @@
     golang_version: 1.20.2
 
   tasks:
-    - name: Get Golang
+    - name: Get Golang x86_64
       command: curl -L "https://go.dev/dl/go{{ golang_version }}.linux-amd64.tar.gz" -o golang.tar.gz
       args:
         chdir: /tmp
         creates: /tmp/golang.tar.gz
+      when: ansible_machine == "x86_64"
+
+    - name: Get Golang aarch64
+      command: curl -L "https://go.dev/dl/go{{ golang_version }}.linux-arm64.tar.gz" -o golang.tar.gz
+      args:
+        chdir: /tmp
+        creates: /tmp/golang.tar.gz
+      when: ansible_machine == "aarch64"
 
     - name: Install Golang
       command: tar -C /usr/local -xzf golang.tar.gz
