@@ -14,9 +14,15 @@
       url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
       state: present
 
-  - name: Add APT repo
+  - name: Add APT repo x86_64
     apt_repository:
       repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
+    when: ansible_machine == "x86_64"
+
+  - name: Add APT repo aarch64
+    apt_repository:
+      repo: "deb [arch=arm64] https://cli.github.com/packages stable main"
+    when: ansible_machine == "aarch64"
 
   - name: Install tools
     apt:
