@@ -9,9 +9,15 @@
       apt_key:
         url: https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg
 
-    - name: Install APT repo
+    - name: Install APT repo x86_64
       apt_repository:
         repo: deb [arch=amd64] https://pkgs.tailscale.com/stable/debian bullseye main
+      when: ansible_machine == "x86_64"
+
+    - name: Install APT repo aarch64
+      apt_repository:
+        repo: deb [arch=arm64] https://pkgs.tailscale.com/stable/debian bullseye main
+      when: ansible_machine == "aarch64"
 
     - name: Install Tailscale
       apt:
