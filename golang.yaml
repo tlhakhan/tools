@@ -4,7 +4,7 @@
   hosts: localhost
   connection: local
   vars:
-    golang_version: 1.20.2
+    golang_version: 1.21.1
 
   tasks:
     - name: Get Golang x86_64
@@ -26,9 +26,10 @@
       args:
         chdir: /tmp
         creates: /usr/local/go/bin/go
+      become: true
 
     - name: Update PATH variable
       lineinfile:
-        path: ~/.profile
+        path: '~/.profile'
         line: "export PATH=$PATH:/usr/local/go/bin"
         create: yes
