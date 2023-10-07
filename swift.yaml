@@ -1,0 +1,48 @@
+- name: Install Swift
+  hosts: my_hosts
+  vars:
+    swift_version: swift-5.9-RELEASE
+
+  tasks:
+    - name: Prerequiste packages
+      apt:
+        name: '{{ item }}'
+      loop:
+        - clang
+        - libicu-dev
+        - build-essential
+        - pkg-config
+        - zlib1g-dev
+
+    - name: Prepare folder for Swift
+      file:
+        path: "/swift/{{ swift_version }}"
+        state: directory
+
+    - name: Get Swift RELEASE for Debian12
+      command: curl -L "https://download.swift.org/{{ swift_version | lower }}/ubuntu2204/{{ swift_version }}/{{ swift_version }}-ubuntu22.04.tar.gz" -o "/tmp/swift.tar.gz"
+      args:
+        creates: /tmp/swift.tar.gz
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution_release == "bookworm"
+    
+    - name: Get Swifth RELEASE for Debian11
+      command: curl -L "https://download.swift.org/{{ swift_version | lower }}/ubuntu2004/{{ swift_version }}/{{ swift_version }}-ubuntu20.04.tar.gz" -o "/tmp/swift.tar.gz"
+      args:
+        creates: /tmp/swift.tar.gz
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution_release == "bullseye"
+    
+    - name: Extract swift.tar.gz
+      command: tar --no-same-owner -zxf swift.tar.gz --strip-components 1 -C /swift/{{ swift_version }}
+      args:
+        chdir: /tmp
+        creates: /swift/{{ swift_version }}/usr/bin/swift
+
+    - name: Add Swift to Path
+      file:
+        src: /swift/{{ swift_version }}/usr/bin/swift
+        dest: /usr/local/bin/swift
+        state: link
