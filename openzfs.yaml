@@ -1,8 +1,6 @@
-#!/usr/local/bin/ansible-playbook
 ---
 - name: Install OpenZFS 
-  hosts: localhost
-  connection: local
+  hosts: my_hosts
 
   tasks:
     - name: Add backports repo

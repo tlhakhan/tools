@@ -1,9 +1,6 @@
-#!/usr/local/bin/ansible-playbook
 ---
 - name: Install Hashicorp tools
-  hosts: localhost
-  become: True
-  connection: local
+  hosts: my_hosts
 
   vars:
     terraform_docs_version: v0.16.0
