@@ -1,0 +1,2 @@
+- import_playbook: awscli.yaml
+- import_playbook: hashicorp.yaml
