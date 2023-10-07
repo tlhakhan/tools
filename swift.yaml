@@ -2,6 +2,7 @@
   hosts: my_hosts
   vars:
     swift_version: swift-5.9-RELEASE
+    swift_format_version: 509.0.0
 
   tasks:
     - name: Prerequiste packages
@@ -41,8 +42,25 @@
         chdir: /tmp
         creates: /swift/{{ swift_version }}/usr/bin/swift
 
-    - name: Add Swift to Path
+    - name: Add swift to path
       file:
         src: /swift/{{ swift_version }}/usr/bin/swift
         dest: /usr/local/bin/swift
+        state: link
+
+    - name: Build swift-format
+      shell: |
+        VERSION={{ swift_format_version }}
+        git clone https://github.com/apple/swift-format.git
+        cd swift-format
+        git checkout "tags/$VERSION"
+        swift build -c release
+      args:
+        chdir: /swift
+        creates: /swift/swift-format/.build/release/swift-format
+
+    - name: Add swift-format to path
+      file:
+        src: /swift/swift-format/.build/release/swift-format
+        dest: /usr/local/bin/swift-format
         state: link
