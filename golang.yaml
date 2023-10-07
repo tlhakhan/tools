@@ -1,10 +1,8 @@
-#!/usr/local/bin/ansible-playbook
 ---
 - name: Install Golang
-  hosts: localhost
-  connection: local
+  hosts: my_hosts
   vars:
-    golang_version: 1.21.1
+    golang_version: 1.21.2
 
   tasks:
     - name: Get Golang x86_64
@@ -28,8 +26,8 @@
         creates: /usr/local/go/bin/go
       become: true
 
-    - name: Update PATH variable
-      lineinfile:
-        path: '~/.profile'
-        line: "export PATH=$PATH:/usr/local/go/bin"
-        create: yes
+    - name: Link go to /usr/local/bin/go
+      file:
+        src: /usr/local/go/bin/go
+        dest: /usr/local/bin/go
+        state: link
