@@ -1,2 +1,5 @@
 [default]
-localhost
+localhost ansible_connection=local
+
+[my_hosts]
+localhost ansible_connection=local
