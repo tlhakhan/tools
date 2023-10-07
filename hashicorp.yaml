@@ -2,7 +2,11 @@
 ---
 - name: Install Hashicorp tools
   hosts: localhost
+  become: True
   connection: local
+
+  vars:
+    terraform_docs_version: v0.16.0
 
   tasks:
   - name: Install gpg package
@@ -28,20 +32,21 @@
     apt:
       update_cache: True
       name: '{{ item }}'
+      state: latest
     loop:
       - packer
       - terraform
       - vault
 
   - name: Download Terraform Docs x86_64
-    command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-amd64.tar.gz" -o "terraform-docs.tar.gz"
+    command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/{{ terraform_docs_version }}/terraform-docs-{{ terraform_docs_version }}-linux-amd64.tar.gz" -o "terraform-docs.tar.gz"
     args:
       chdir: /tmp
       creates: /tmp/terraform-docs.tar.gz
     when: ansible_machine == "x86_64"
 
   - name: Download Terraform Docs aarch64
-    command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-arm64.tar.gz" -o "terraform-docs.tar.gz"
+    command: curl -L "https://github.com/terraform-docs/terraform-docs/releases/download/{{ terraform_docs_version }}/terraform-docs-{{ terraform_docs_version }}-linux-arm64.tar.gz" -o "terraform-docs.tar.gz"
     args:
       chdir: /tmp
       creates: /tmp/terraform-docs.tar.gz
