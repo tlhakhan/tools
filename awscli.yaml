@@ -2,10 +2,12 @@
 ---
 - name: Install AWS CLI v2
   hosts: localhost
+  become: True
   connection: local
 
   vars:
-    iamlive_version: v0.51.2
+    iamlive_version: v1.1.1
+    iam_policy_json_to_terraform_version: 1.8.2
 
   tasks:
 
@@ -59,13 +61,13 @@
         creates: /usr/local/bin/iamlive
 
     - name: Download IAM policy to Terraform x86_64
-      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/1.8.2/iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
+      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/{{ iam_policy_json_to_terraform_version }} /iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
       args:
         creates: /tmp/iamtf
       when: ansible_machine == "x86_64"
 
     - name: Download IAM policy to Terraform
-      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/1.8.2/iam-policy-json-to-terraform_arm64" -o "/tmp/iamtf"
+      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/{{ iam_policy_json_to_terraform_version }}/iam-policy-json-to-terraform_arm64" -o "/tmp/iamtf"
       args:
         creates: /tmp/iamtf
       when: ansible_machine == "aarch64"
