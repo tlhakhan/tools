@@ -1,8 +1,8 @@
 #!/usr/local/bin/ansible-playbook
 ---
 - name: Install Helm
-  hosts: localhost
-  connection: local
+  hosts: my_hosts
+  become: True
 
   tasks:
 

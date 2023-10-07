@@ -1,9 +1,7 @@
 #!/usr/local/bin/ansible-playbook
 ---
 - name: Install AWS CLI v2
-  hosts: localhost
-  become: True
-  connection: local
+  hosts: my_hosts
 
   vars:
     iamlive_version: v1.1.1

@@ -1,11 +1,8 @@
 #!/usr/local/bin/ansible-playbook
 ---
 - name: Install Docker
-  hosts: localhost
-  become: true
-  connection: local
+  hosts: my_hosts
   tasks:
-
     - name: Install OS packages
       apt:
         update_cache: True
@@ -55,6 +52,7 @@
       apt:
         update_cache: True
         name: '{{ item }}'
+        state: latest
       loop:
         - docker-ce
         - docker-ce-cli

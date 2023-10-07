@@ -1,9 +1,6 @@
-#!/usr/local/bin/ansible-playbook
 ---
 - name: Install GitHub tools
-  hosts: localhost
-  connection: local
-
+  hosts: my_hosts
   tasks:
   - name: Install gpg package
     package:
