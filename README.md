@@ -1,7 +1,6 @@
 # README
 A repository with Ansible playbooks to help install specific cloud tools.
-
-Preferred OS: Debian 11
+Selected OS: Debian 12
 
 ## Appendix
 ### Install Ansible on Debian 11
