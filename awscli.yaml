@@ -59,7 +59,7 @@
         creates: /usr/local/bin/iamlive
 
     - name: Download IAM policy to Terraform x86_64
-      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/{{ iam_policy_json_to_terraform_version }} /iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
+      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/{{ iam_policy_json_to_terraform_version }}/iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
       args:
         creates: /tmp/iamtf
       when: ansible_machine == "x86_64"
