@@ -72,3 +72,8 @@
         chdir: /usr/local/bin
         creates: /usr/local/bin/docker-compose
       when: ansible_machine == "x86_64"
+
+    - name: Set the execute bit on docker-compose
+      file:
+        path: /usr/local/bin/docker-compose
+        mode: 0755
