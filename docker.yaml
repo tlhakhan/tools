@@ -2,6 +2,8 @@
 ---
 - name: Install Docker
   hosts: my_hosts
+  vars:
+    docker_compose_version: v2.23.1
   tasks:
     - name: Install OS packages
       apt:
@@ -63,3 +65,10 @@
         name: docker
         state: started
         enabled: True
+
+    - name: Install docker-compose
+      command: curl -L https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-x86_64 -o "docker-compose"
+      args:
+        chdir: /usr/local/bin
+        creates: /usr/local/bin/docker-compose
+      when: ansible_machine == "x86_64"
