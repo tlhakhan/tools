@@ -3,6 +3,13 @@
   hosts: my_hosts
 
   tasks:
+    - name: Install pre-req packages
+      apt:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - gpg
+
     - name: Install GPG key
       apt_key:
         url: https://pkgs.tailscale.com/stable/debian/bullseye.noarmor.gpg
