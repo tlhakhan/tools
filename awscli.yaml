@@ -1,4 +1,3 @@
-#!/usr/local/bin/ansible-playbook
 ---
 - name: Install AWS CLI v2
   hosts: my_hosts
