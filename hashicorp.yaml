@@ -3,7 +3,7 @@
   hosts: my_hosts
 
   vars:
-    terraform_docs_version: v0.16.0
+    terraform_docs_version: v0.17.0
 
   tasks:
   - name: Install gpg package
