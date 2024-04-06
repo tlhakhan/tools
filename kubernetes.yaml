@@ -3,7 +3,8 @@
   hosts: my_hosts
 
   vars:
-    kubernetes_version: 1.28.1
+    kubectl_arm64_url: https://distro.eks.amazonaws.com/kubernetes-1-29/releases/8/artifacts/kubernetes/v1.29.1/bin/linux/arm64/kubectl
+    kubectl_amd64_url: https://distro.eks.amazonaws.com/kubernetes-1-29/releases/8/artifacts/kubernetes/v1.29.1/bin/linux/amd64/kubectl
 
   tasks:
     - name: Install pre-req packages
@@ -17,29 +18,16 @@
         - curl
         - gnupg
 
-    - name: Install Kubernetes repo key
-      apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
-        state: present
+    - name: Install kubectl
+      get_url:
+        url: "{{ kubectl_arm64_url }}"
+        dest: /usr/bin/kubectl
+        mode: 0755
+      when: ansible_machine == "aarch64"
 
-    - name: Install Kuberentes repo
-      apt_repository:
-        repo: 'deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main'
-        state: present
-        filename: kubernetes
-
-    - name: Install kubectl package
-      apt:
-        name: '{{ item }}={{ kubernetes_version }}-00'
-        update_cache: True
-        allow_downgrades: True
-      loop:
-        - kubectl
-
-    - name: Hold the installed kubectl package to prevent upgrades
-      dpkg_selections:
-        name: '{{ item }}'
-        selection: hold
-      loop:
-        - kubectl
+    - name: Install kubectl
+      get_url:
+        url: "{{ kubectl_amd64_url }}"
+        dest: /usr/bin/kubectl
+        mode: 0755
+      when: ansible_machine == "amd64"
