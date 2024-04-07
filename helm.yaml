@@ -1,11 +1,8 @@
-#!/usr/local/bin/ansible-playbook
 ---
 - name: Install Helm
   hosts: my_hosts
-  become: True
 
   tasks:
-
     - name: Get Helm install script
       command: curl "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3" -o "/tmp/get_helm.sh"
       args:
