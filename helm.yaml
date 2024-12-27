@@ -1,3 +1,4 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Install Helm
   hosts: my_hosts
@@ -12,3 +13,4 @@
       command: bash /tmp/get_helm.sh
       args:
         creates: /usr/local/bin/helm
+      become: True

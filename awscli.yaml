@@ -1,10 +1,10 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Install AWS CLI v2
   hosts: my_hosts
 
   vars:
-    iamlive_version: v1.1.1
-    iam_policy_json_to_terraform_version: 1.8.2
+    iamlive_version: v1.1.12
 
   tasks:
     - name: Get AWS CLI archive for Linux amd64
@@ -25,16 +25,12 @@
         chdir: /tmp
         creates: /tmp/aws
 
-    - name: Create a ~/.local/bin folder
-      file:
-        path: ~/.local/bin
-        state: directory
-
     - name: Install AWS CLI
-      command: ./install --bin-dir ~/.local/bin --install-dir ~/.local/aws-cli --update
+      command: ./install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
       args:
         chdir: /tmp/aws
-        creates: ~/.local/bin/aws
+        creates: /usr/local/bin/aws
+      become: True
 
     - name: Install IAMLive x86_64
       command: curl -L "https://github.com/iann0036/iamlive/releases/download/{{ iamlive_version }}/iamlive-{{ iamlive_version }}-linux-amd64.tar.gz" -o "/tmp/iamlive.tar.gz"
@@ -49,25 +45,8 @@
       when: ansible_machine == "aarch64"
 
     - name: Extract iamlive.tar.gz
-      command: tar --no-same-owner -zxf /tmp/iamlive.tar.gz -C ~/.local/bin
+      command: tar --no-same-owner -zxf /tmp/iamlive.tar.gz -C /usr/local/bin
       args:
         chdir: /tmp
-        creates: ~/.local/bin/iamlive
-
-    - name: Download IAM policy to Terraform x86_64
-      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/{{ iam_policy_json_to_terraform_version }}/iam-policy-json-to-terraform_amd64" -o "/tmp/iamtf"
-      args:
-        creates: /tmp/iamtf
-      when: ansible_machine == "x86_64"
-
-    - name: Download IAM policy to Terraform
-      command: curl -L "https://github.com/flosell/iam-policy-json-to-terraform/releases/download/{{ iam_policy_json_to_terraform_version }}/iam-policy-json-to-terraform_arm64" -o "/tmp/iamtf"
-      args:
-        creates: /tmp/iamtf
-      when: ansible_machine == "aarch64"
-
-    - name: Copy iamtf to ~/.local/bin
-      copy:
-        src: /tmp/iamtf
-        dest: ~/.local/bin/
-        mode: 0755
+        creates: /usr/local/bin/iamlive
+      become: True

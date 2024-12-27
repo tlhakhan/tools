@@ -1,6 +1,8 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Install GitHub tools
   hosts: my_hosts
+  become: True
   tasks:
   - name: Install gpg package
     package:

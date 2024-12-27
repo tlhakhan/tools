@@ -1,10 +1,11 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Install Kubernetes tools
   hosts: my_hosts
-
+  become: True
   vars:
-    kubectl_arm64_url: https://distro.eks.amazonaws.com/kubernetes-1-29/releases/8/artifacts/kubernetes/v1.29.1/bin/linux/arm64/kubectl
-    kubectl_amd64_url: https://distro.eks.amazonaws.com/kubernetes-1-29/releases/8/artifacts/kubernetes/v1.29.1/bin/linux/amd64/kubectl
+    kubectl_arm64_url: https://distro.eks.amazonaws.com/kubernetes-1-31/releases/9/artifacts/kubernetes/v1.31.3/bin/linux/arm64/kubectl
+    kubectl_amd64_url: https://distro.eks.amazonaws.com/kubernetes-1-31/releases/9/artifacts/kubernetes/v1.31.3/bin/linux/amd64/kubectl
 
   tasks:
     - name: Install pre-req packages
@@ -18,16 +19,22 @@
         - curl
         - gnupg
 
-    - name: Install kubectl
+    - name: Install kubectl (aarch64)
       get_url:
         url: "{{ kubectl_arm64_url }}"
         dest: /usr/bin/kubectl
         mode: 0755
       when: ansible_machine == "aarch64"
 
-    - name: Install kubectl
+    - name: Install kubectl (amd64)
       get_url:
         url: "{{ kubectl_amd64_url }}"
         dest: /usr/bin/kubectl
         mode: 0755
-      when: ansible_machine == "amd64"
+      when: ansible_machine == "x86_64"
+
+    - name: Setup aliases
+      lineinfile:
+        path: ~/.bash_aliases
+        line: alias k='kubectl'
+      become: False

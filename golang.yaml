@@ -1,9 +1,9 @@
+#!/usr/bin/env ansible-playbook
 ---
 - name: Install Golang
   hosts: my_hosts
   vars:
-    golang_version: 1.22.2
-
+    golang_version: 1.23.4
   tasks:
     - name: Get Golang x86_64
       command: curl -L "https://go.dev/dl/go{{ golang_version }}.linux-amd64.tar.gz" -o golang.tar.gz
@@ -31,3 +31,4 @@
         src: /usr/local/go/bin/go
         dest: /usr/local/bin/go
         state: link
+      become: True
