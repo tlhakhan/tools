@@ -62,6 +62,11 @@
       creates: /usr/local/bin/terraform-docs
     become: True
 
+  - name: Create bash_aliases
+    file:
+      path: ~/.bash_aliases
+      state: touch
+
   - name: Setup aliases
     lineinfile:
       path: ~/.bash_aliases
