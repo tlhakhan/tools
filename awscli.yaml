@@ -7,6 +7,13 @@
     iamlive_version: v1.1.23
 
   tasks:
+    - name: Install OS packages
+      package:
+        name: '{{ item }}'
+        state: present
+      with_items:
+        - unzip
+
     - name: Get AWS CLI archive for Linux amd64
       command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
       args:
