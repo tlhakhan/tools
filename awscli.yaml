@@ -2,6 +2,7 @@
 ---
 - name: Install AWS CLI v2
   hosts: my_hosts
+  gather_facts: True
 
   vars:
     iamlive_version: v1.1.23
@@ -18,13 +19,13 @@
       command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
       args:
         creates: /tmp/awscliv2.zip
-      when: ansible_machine == "x86_64"
+      when: ansible_facts["machine"] == "x86_64"
 
     - name: Get AWS CLI archive for Linux aarch64
       command: curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "/tmp/awscliv2.zip"
       args:
         creates: /tmp/awscliv2.zip
-      when: ansible_machine == "aarch64"
+      when: ansible_facts['machine'] == "aarch64"
 
     - name: Unzip the awscliv2.zip
       command: unzip awscliv2.zip
@@ -43,13 +44,13 @@
       command: curl -L "https://github.com/iann0036/iamlive/releases/download/{{ iamlive_version }}/iamlive-{{ iamlive_version }}-linux-amd64.tar.gz" -o "/tmp/iamlive.tar.gz"
       args:
         creates: /tmp/iamlive.tar.gz
-      when: ansible_machine == "x86_64"
+      when: ansible_facts['machine'] == "x86_64"
 
     - name: Install IAMLive aarch64
       command: curl -L "https://github.com/iann0036/iamlive/releases/download/{{ iamlive_version }}/iamlive-{{ iamlive_version }}-linux-arm64.tar.gz" -o "/tmp/iamlive.tar.gz"
       args:
         creates: /tmp/iamlive.tar.gz
-      when: ansible_machine == "aarch64"
+      when: ansible_facts['machine'] == "aarch64"
 
     - name: Extract iamlive.tar.gz
       command: tar --no-same-owner -zxf /tmp/iamlive.tar.gz -C /usr/local/bin
