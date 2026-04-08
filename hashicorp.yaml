@@ -5,11 +5,11 @@
   gather_facts: True
 
   vars:
-    terraform_docs_version: v0.20.0
+    terraform_docs_version: v0.22.0
 
   tasks:
   - debug:
-      msg: "user {{ ansible_facts['env']['SUDO_USER'] }} ran the sudo to become root"
+      msg: "user {{ ansible_facts['user_id'] }}"
 
   - name: Install gpg package
     package:
@@ -68,13 +68,13 @@
 
   - name: Create bash_aliases
     file:
-      path: "/home/{{ ansible_facts['env']['SUDO_USER'] }}/.bash_aliases"
+      path: "{{ ansible_facts['user_dir'] }}/.bash_aliases"
       state: touch
     changed_when: false
 
   - name: Setup aliases
     lineinfile:
-      path: "/home/{{ ansible_facts['env']['SUDO_USER'] }}/.bash_aliases"
+      path: "{{ ansible_facts['user_dir'] }}/.bash_aliases"
       line:  '{{ item }}'
     loop:
       - alias tf='terraform'
