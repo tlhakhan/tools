@@ -3,32 +3,47 @@
 - name: Install Golang
   hosts: my_hosts
   vars:
-    golang_version: 1.23.4
+    golang_version: ""  # Leave empty for latest stable, or pin e.g. "go1.22.2"
   tasks:
-    - name: Get Golang x86_64
-      command: curl -L "https://go.dev/dl/go{{ golang_version }}.linux-amd64.tar.gz" -o golang.tar.gz
-      args:
-        chdir: /tmp
-        creates: /tmp/golang.tar.gz
-      when: ansible_machine == "x86_64"
+    - name: Set Golang arch
+      set_fact:
+        golang_arch: "{{ 'arm64' if ansible_facts['machine'] == 'aarch64' else 'amd64' }}"
 
-    - name: Get Golang aarch64
-      command: curl -L "https://go.dev/dl/go{{ golang_version }}.linux-arm64.tar.gz" -o golang.tar.gz
-      args:
-        chdir: /tmp
-        creates: /tmp/golang.tar.gz
-      when: ansible_machine == "aarch64"
+    - name: Fetch latest stable Golang version
+      uri:
+        url: https://go.dev/dl/?mode=json
+      register: go_releases
+      when: not golang_version
+
+    - name: Set Golang version to latest stable
+      set_fact:
+        golang_version: "{{ go_releases.json | selectattr('stable', 'equalto', true) | map(attribute='version') | first }}"
+      when: not golang_version
+
+    - name: Ensure XDG directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ ansible_facts['user_dir'] }}/downloads"
+        - "{{ ansible_facts['user_dir'] }}/.local/share"
+        - "{{ ansible_facts['user_dir'] }}/.local/bin"
+
+    - name: Download Golang
+      get_url:
+        url: "https://go.dev/dl/{{ golang_version }}.linux-{{ golang_arch }}.tar.gz"
+        dest: "{{ ansible_facts['user_dir'] }}/downloads/"
 
     - name: Install Golang
-      command: tar -C /usr/local -xzf golang.tar.gz
-      args:
-        chdir: /tmp
-        creates: /usr/local/go/bin/go
-      become: true
+      unarchive:
+        src: "{{ ansible_facts['user_dir'] }}/downloads/{{ golang_version }}.linux-{{ golang_arch }}.tar.gz"
+        dest: "{{ ansible_facts['user_dir'] }}/.local/share"
+        remote_src: true
+        creates: "{{ ansible_facts['user_dir'] }}/.local/share/go/bin/go"
 
-    - name: Link go to /usr/local/bin/go
+    - name: Link go to ~/.local/bin/go
       file:
-        src: /usr/local/go/bin/go
-        dest: /usr/local/bin/go
+        src: "{{ ansible_facts['user_dir'] }}/.local/share/go/bin/go"
+        dest: "{{ ansible_facts['user_dir'] }}/.local/bin/go"
         state: link
-      become: True
