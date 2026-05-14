@@ -1,0 +1,40 @@
+---
+- name: Install Tailscale
+  hosts: my_hosts
+  gather_facts: True
+  become: True
+
+  tasks:
+    - name: Install prerequisite packages
+      apt:
+        update_cache: True
+        name: curl
+        state: present
+
+    - name: Download Tailscale GPG key
+      get_url:
+        url: https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts['distribution_release'] }}.noarmor.gpg
+        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+        mode: '0644'
+
+    - name: Add Tailscale APT repository
+      get_url:
+        url: https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_facts['distribution_release'] }}.tailscale-keyring.list
+        dest: /etc/apt/sources.list.d/tailscale.list
+        mode: '0644'
+
+    - name: Install Tailscale
+      apt:
+        update_cache: True
+        name: tailscale
+        state: latest
+
+    - name: Enable and start tailscaled
+      service:
+        name: tailscaled
+        state: started
+        enabled: True
+
+    - name: Next step
+      debug:
+        msg: "Run 'sudo tailscale up' to authenticate this node."

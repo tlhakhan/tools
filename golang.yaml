@@ -1,4 +1,3 @@
-#!/usr/bin/env ansible-playbook
 ---
 - name: Install Golang
   hosts: my_hosts
@@ -42,8 +41,11 @@
         remote_src: true
         creates: "{{ ansible_facts['user_dir'] }}/.local/share/go/bin/go"
 
-    - name: Link go to ~/.local/bin/go
+    - name: Link Go binaries to ~/.local/bin
       file:
-        src: "{{ ansible_facts['user_dir'] }}/.local/share/go/bin/go"
-        dest: "{{ ansible_facts['user_dir'] }}/.local/bin/go"
+        src: "{{ ansible_facts['user_dir'] }}/.local/share/go/bin/{{ item }}"
+        dest: "{{ ansible_facts['user_dir'] }}/.local/bin/{{ item }}"
         state: link
+      loop:
+        - go
+        - gofmt
