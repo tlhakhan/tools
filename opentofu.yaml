@@ -1,0 +1,75 @@
+#!/usr/bin/env ansible-playbook
+---
+- name: Install OpenTofu
+  hosts: my_hosts
+  gather_facts: True
+
+  tasks:
+  - name: Install prerequisite packages
+    apt:
+      update_cache: True
+      name: '{{ item }}'
+      state: present
+    loop:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+    become: True
+
+  - name: Create keyrings directory
+    file:
+      path: /etc/apt/keyrings
+      state: directory
+      mode: '0755'
+    become: True
+
+  - name: Download OpenTofu GPG key
+    shell: curl -fsSL https://get.opentofu.org/opentofu.gpg | tee /etc/apt/keyrings/opentofu.gpg >/dev/null
+    args:
+      creates: /etc/apt/keyrings/opentofu.gpg
+    become: True
+
+  - name: Download OpenTofu repo GPG key
+    shell: curl -fsSL https://packages.opentofu.org/opentofu/tofu/gpgkey | gpg --no-tty --batch --dearmor -o /etc/apt/keyrings/opentofu-repo.gpg >/dev/null
+    args:
+      creates: /etc/apt/keyrings/opentofu-repo.gpg
+    become: True
+
+  - name: Set GPG key permissions
+    file:
+      path: '{{ item }}'
+      mode: 'a+r'
+    loop:
+      - /etc/apt/keyrings/opentofu.gpg
+      - /etc/apt/keyrings/opentofu-repo.gpg
+    become: True
+
+  - name: Add OpenTofu APT repository
+    copy:
+      dest: /etc/apt/sources.list.d/opentofu.list
+      mode: 'a+r'
+      content: |
+        deb [signed-by=/etc/apt/keyrings/opentofu.gpg,/etc/apt/keyrings/opentofu-repo.gpg] https://packages.opentofu.org/opentofu/tofu/any/ any main
+        deb-src [signed-by=/etc/apt/keyrings/opentofu.gpg,/etc/apt/keyrings/opentofu-repo.gpg] https://packages.opentofu.org/opentofu/tofu/any/ any main
+    become: True
+
+  - name: Install OpenTofu
+    apt:
+      update_cache: True
+      name: tofu
+      state: latest
+    become: True
+
+  - name: Create bash_aliases
+    file:
+      path: "{{ ansible_facts['user_dir'] }}/.bash_aliases"
+      state: touch
+    changed_when: false
+
+  - name: Setup aliases
+    lineinfile:
+      path: "{{ ansible_facts['user_dir'] }}/.bash_aliases"
+      line: '{{ item }}'
+    loop:
+      - alias tf='tofu'
