@@ -5,7 +5,9 @@
   become: True
 
   vars:
-    docker_compose_version: v5.1.3
+    docker_arch_map:
+      x86_64: amd64
+      aarch64: arm64
 
   tasks:
     - name: Install prerequisite packages
@@ -34,17 +36,16 @@
         path: /etc/apt/keyrings/docker.gpg
         mode: 'a+r'
 
-    - name: Add Docker APT repository x86_64
+    - name: Add Docker APT repository
       copy:
         dest: /etc/apt/sources.list.d/docker.list
-        content: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] }} stable\n"
-      when: ansible_facts['machine'] == "x86_64"
+        content: "deb [arch={{ docker_arch_map[ansible_facts['machine']] }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] }} stable\n"
 
-    - name: Add Docker APT repository aarch64
-      copy:
-        dest: /etc/apt/sources.list.d/docker.list
-        content: "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] }} stable\n"
-      when: ansible_facts['machine'] == "aarch64"
+    - name: Create Docker data directory
+      file:
+        path: /data
+        state: directory
+        mode: '0711'
 
     - name: Create Docker config folder
       file:
@@ -56,6 +57,7 @@
         dest: /etc/docker/daemon.json
         content: |
           {
+            "data-root": "/data",
             "log-driver": "json-file",
             "bip": "192.168.127.5/24",
             "default-address-pools": [
@@ -84,20 +86,6 @@
         name: docker
         state: started
         enabled: True
-
-    - name: Install docker-compose x86_64
-      get_url:
-        url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: '0755'
-      when: ansible_facts['machine'] == "x86_64"
-
-    - name: Install docker-compose aarch64
-      get_url:
-        url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-aarch64
-        dest: /usr/local/bin/docker-compose
-        mode: '0755'
-      when: ansible_facts['machine'] == "aarch64"
 
     - name: Add user to docker group
       debug:
