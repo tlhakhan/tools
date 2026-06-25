@@ -3,28 +3,37 @@
   hosts: my_hosts
   become: True
   tasks:
-  - name: Install gpg package
-    package:
-      name: gpg
-
-  - name: Get GPG key
-    apt_key:
-      url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
-      state: present
-
-  - name: Add APT repo x86_64
-    apt_repository:
-      repo: "deb [arch=amd64] https://cli.github.com/packages stable main"
-    when: ansible_machine == "x86_64"
-
-  - name: Add APT repo aarch64
-    apt_repository:
-      repo: "deb [arch=arm64] https://cli.github.com/packages stable main"
-    when: ansible_machine == "aarch64"
-
-  - name: Install tools
+  - name: Install prerequisites
     apt:
-      update_cache: True
-      name: '{{ item }}'
-    loop:
-      - gh
+      name:
+        - wget
+        - gpg
+      state: present
+      update_cache: true
+
+  - name: Create keyrings directory
+    file:
+      path: /etc/apt/keyrings
+      state: directory
+      mode: '0755'
+
+  - name: Download GitHub CLI GPG key
+    get_url:
+      url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+      dest: /etc/apt/keyrings/githubcli-archive-keyring.gpg
+      mode: '0644'
+
+  - name: Get system architecture
+    command: dpkg --print-architecture
+    register: dpkg_arch
+    changed_when: false
+
+  - name: Add GitHub CLI APT repository
+    apt_repository:
+      repo: "deb [arch={{ dpkg_arch.stdout }} signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+      filename: github-cli
+
+  - name: Install gh
+    apt:
+      name: gh
+      update_cache: true
